@@ -37,14 +37,19 @@ color ray_color(const ray &r, const hittable &world, int depth) {
 
 int main() {
   const int image_width = 384;
-  const int image_height = static_cast<int>(image_width / (16.0 / 9.0));
+  const double aspect_ratio = 16.0 / 9.0;
+  const int image_height = static_cast<int>(image_width / aspect_ratio);
   const int samples_per_pixel = 20;
   const int max_depth = 50;
 
   std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-  camera cam(point3(-2, 2, 1), point3(0, 0, -1), vec3(0, 1, 0), 90,
-             double(image_width) / image_height);
+  point3 lookfrom(3, 3, 2);
+  point3 lookat(0, 0, 1);
+  vec3 vup(0, 1, 0);
+  auto dist_to_focut = (lookfrom - lookat).length();
+  auto aperture = 2.0;
+  camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focut);
 
   hittable_list world;
   world.add(make_shared<sphere>(point3(0, 0, -1), 0.5,
