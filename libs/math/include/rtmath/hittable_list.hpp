@@ -1,3 +1,5 @@
+#pragma once
+
 #include "hittable.hpp"
 
 #include <memory>

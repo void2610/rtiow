@@ -1,6 +1,9 @@
 #include <iostream>
 #include <rtmath/color.hpp>
+#include <rtmath/hittable_list.hpp>
 #include <rtmath/ray.hpp>
+#include <rtmath/sphere.hpp>
+#include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
 
 using color = rtmath::color;

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "vec.hpp"
 
 using point3 = rtmath::point3;

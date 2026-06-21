@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ray.hpp"
 
 struct hit_record {

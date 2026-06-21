@@ -1,3 +1,5 @@
+#pragma once
+
 #include "hittable.hpp"
 
 class sphere : public hittable {
