@@ -24,13 +24,13 @@ public:
   vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 
   double operator[](int i) const {
-    if (0 < i || i <= 3)
+    if (i < 0 || 3 <= i)
       throw std::out_of_range("vec3の添え字は0,1,2のいずれかです");
     return e[i];
   };
 
   double &operator[](int i) {
-    if (0 < i || i <= 3)
+    if (i < 0 || 3 <= i)
       throw std::out_of_range("vec3の添え字は0,1,2のいずれかです");
     return e[i];
   };
