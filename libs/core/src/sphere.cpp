@@ -19,6 +19,7 @@ bool sphere::hit(const rtmath::ray &r, double t_min, double t_max,
       rec.t = temp;
       rec.p = r.at(rec.t);
       rec.set_face_normal(r, (rec.p - center) / radius);
+      rec.mat_ptr = mat_ptr;
       return true;
     }
     temp = (-half_b + root) / a;
@@ -26,6 +27,7 @@ bool sphere::hit(const rtmath::ray &r, double t_min, double t_max,
       rec.t = temp;
       rec.p = r.at(rec.t);
       rec.set_face_normal(r, (rec.p - center) / radius);
+      rec.mat_ptr = mat_ptr;
       return true;
     }
   }
