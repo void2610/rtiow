@@ -1,4 +1,4 @@
-#include "hittable_list.hpp"
+#include <rtmath/hittable_list.hpp>
 
 bool hittable_list::hit(const ray &r, double t_min, double t_max,
                         hit_record &rec) const {

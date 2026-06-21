@@ -1,7 +1,7 @@
 # 仮想関数の定義を持つ .cpp をコンパイルするため STATIC ライブラリにする
 add_library(rtmath STATIC
-  include/rtmath/sphere.cpp
-  include/rtmath/hittable_list.cpp
+  src/sphere.cpp
+  src/hittable_list.cpp
 )
 # 自身のビルドと利用側の両方にインクルードパスを伝える
 target_include_directories(rtmath PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
