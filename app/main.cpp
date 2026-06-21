@@ -11,21 +11,6 @@
 using namespace rtmath;
 using namespace rtcore;
 
-// 引数で与えられた球体にrayが当たったかを計算する。当たった場所のカメラに近い方のtを返す。当たらなかったら-1を返す
-double hit_sphere(const point3 &center, double radius, const ray &r) {
-  vec3 oc = r.origin() - center;
-  auto a = r.direction().length_squared();
-  auto half_b = dot(oc, r.direction());
-  auto c = oc.length_squared() - radius * radius;
-  auto discriminant = half_b * half_b - a * c;
-
-  if (discriminant < 0) {
-    return -1.0;
-  } else {
-    return (-half_b - sqrt(discriminant)) / a;
-  }
-}
-
 // レイの動きを演算して色を返す。引数の物体に当たったらその法線に対応する色、当たらなかったら白-水色のグラデーション(背景色)を返す
 color ray_color(const ray &r, const hittable &world) {
   hit_record rec;
