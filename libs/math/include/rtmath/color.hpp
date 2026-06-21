@@ -20,11 +20,11 @@ inline void write_color(std::ostream &out, color pixel_color,
   auto g = pixel_color.y();
   auto b = pixel_color.z();
 
-  // 色の和をサンプルで割る
+  // 色の和をサンプルで割り、gamma=2.0のガンマ補正を行う
   auto scale = 1.0 / samples_per_pixel;
-  r *= scale;
-  g *= scale;
-  b *= scale;
+  r = sqrt(scale * r);
+  g = sqrt(scale * g);
+  b = sqrt(scale * b);
 
   // 各成分を [0,255] に変換して出力する
   out << static_cast<int>(255.999 * clamp(r, 0.0, 0.999)) << ' '
