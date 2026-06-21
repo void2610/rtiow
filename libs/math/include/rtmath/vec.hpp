@@ -59,7 +59,7 @@ public:
     return *this;
   }
 
-  vec3 operator/=(const double &t) { return *this *= 1 / t; }
+  vec3 &operator/=(const double &t) { return *this *= 1 / t; }
 
   // ユーティリティ
 
