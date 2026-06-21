@@ -1,7 +1,7 @@
 #include <cmath>
-#include <ctime>
 #include <rtmath/sphere.hpp>
 
+namespace rtmath {
 bool sphere::hit(const ray &r, double t_min, double t_max,
                  hit_record &rec) const {
   vec3 oc = r.origin() - center;
@@ -11,7 +11,7 @@ bool sphere::hit(const ray &r, double t_min, double t_max,
   auto discriminant = half_b * half_b - a * c;
 
   if (discriminant > 0) {
-    auto root = sqrt(discriminant);
+    auto root = std::sqrt(discriminant);
     auto temp = (-half_b - root) / a;
     if (temp < t_max && temp > t_min) {
       rec.t = temp;
@@ -29,3 +29,4 @@ bool sphere::hit(const ray &r, double t_min, double t_max,
   }
   return false;
 }
+} // namespace rtmath

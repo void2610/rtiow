@@ -8,7 +8,7 @@
 #include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
 
-using color = rtmath::color;
+using namespace rtmath;
 
 // 引数で与えられた球体にrayが当たったかを計算する。当たった場所のカメラに近い方のtを返す。当たらなかったら-1を返す
 double hit_sphere(const point3 &center, double radius, const ray &r) {

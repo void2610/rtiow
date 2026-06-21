@@ -2,6 +2,7 @@
 
 #include "hittable.hpp"
 
+namespace rtmath {
 class sphere : public hittable {
 public:
   sphere() {}
@@ -13,3 +14,4 @@ public:
   point3 center;
   double radius;
 };
+} // namespace rtmath

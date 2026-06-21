@@ -2,9 +2,7 @@
 
 #include "vec.hpp"
 
-using point3 = rtmath::point3;
-using vec3 = rtmath::vec3;
-
+namespace rtmath {
 class ray {
 public:
   ray() {}
@@ -19,3 +17,4 @@ public:
   point3 orig;
   vec3 dir;
 };
+} // namespace rtmath

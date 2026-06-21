@@ -1,5 +1,6 @@
 #include <rtmath/hittable_list.hpp>
 
+namespace rtmath {
 bool hittable_list::hit(const ray &r, double t_min, double t_max,
                         hit_record &rec) const {
   hit_record temp_rec;
@@ -16,3 +17,4 @@ bool hittable_list::hit(const ray &r, double t_min, double t_max,
 
   return hit_anything;
 }
+} // namespace rtmath
