@@ -145,7 +145,8 @@ template <class T, int N> inline vec<T, N> operator*(const vec<T, N> &v, T t) {
   return t * v;
 }
 
-template <class T, int N> inline vec<T, N> operator/(const vec<T, N> &v, double t) {
+template <class T, int N>
+inline vec<T, N> operator/(const vec<T, N> &v, double t) {
   return (1 / t) * v;
 }
 
@@ -157,8 +158,9 @@ template <class T, int N> inline T dot(const vec<T, N> &u, const vec<T, N> &v) {
   return r;
 }
 
-// TODO: 4次元以上の外積は謎
+// 外積はN==3の時だけ存在する
 template <class T, int N>
+  requires(N == 3)
 inline vec<T, N> cross(const vec<T, N> &u, const vec<T, N> &v) {
   return vec<T, N>(u.e[1] * v.e[2] - u.e[2] * v.e[1],
                    u.e[2] * v.e[0] - u.e[0] * v.e[2],
