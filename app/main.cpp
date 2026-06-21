@@ -1,4 +1,6 @@
 #include <iostream>
+#include <rtmath/color.hpp>
+#include <rtmath/vec.hpp>
 
 int main() {
   const int image_width = 256;
@@ -13,11 +15,9 @@ int main() {
       auto g = double(j) / (image_height - 1);
       auto b = 0.25;
 
-      int ir = static_cast<int>(255.999 * r);
-      int ig = static_cast<int>(255.999 * g);
-      int ib = static_cast<int>(255.999 * b);
-
-      std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+      rtmath::color c(double(i) / (image_width - 1),
+                      double(j) / (image_width - 1), 0.25);
+      write_color(std::cout, c);
     }
   }
   std::cerr << "\nDone.\n";
