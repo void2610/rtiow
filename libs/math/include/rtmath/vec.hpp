@@ -3,12 +3,13 @@
 #include "rtmath/utils.hpp"
 #include <array>
 #include <cmath>
+#include <concepts>
 #include <ostream>
 #include <stdexcept>
 
 namespace rtmath {
 
-template <class T, int N> class vec {
+template <std::floating_point T, std::size_t N> class vec {
 public:
   // コンストラクタ
 
@@ -26,7 +27,7 @@ public:
 
   inline static vec random() {
     vec r;
-    for (int i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       r.e[i] = random_value<T>();
     }
     return r;
@@ -34,7 +35,7 @@ public:
 
   inline static vec random(double min, double max) {
     vec r;
-    for (int i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       r.e[i] = random_value<T>(min, max);
     }
     return r;
@@ -44,33 +45,33 @@ public:
 
   vec operator-() const {
     vec r;
-    for (int i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       r.e[i] = -e[i];
     }
     return r;
   }
 
-  double operator[](int i) const {
-    if (i < 0 || N <= i)
+  double operator[](std::size_t i) const {
+    if (N <= i)
       throw std::out_of_range("vecの大きさ外にアクセスしています");
     return e[i];
   };
 
-  double &operator[](int i) {
-    if (i < 0 || N <= i)
+  double &operator[](std::size_t i) {
+    if (N <= i)
       throw std::out_of_range("vecの大きさ外にアクセスしています");
     return e[i];
   };
 
   vec &operator+=(const vec &v) {
-    for (int i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       e[i] += v.e[i];
     }
     return *this;
   }
 
   vec &operator*=(const double t) {
-    for (int i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       e[i] *= t;
     }
     return *this;
@@ -86,7 +87,7 @@ public:
   // 全ての要素の2乗を足し合わせて返す
   double length_squared() const {
     double l = 0.0;
-    for (int i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       l += e[i] * e[i];
     }
     return l;
@@ -97,69 +98,71 @@ public:
 
 // ユーティリティ
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline std::ostream &operator<<(std::ostream &out, const vec<T, N> &v) {
-  for (int i = 0; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     out << v[i] << ' ';
   }
   return out;
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> operator+(const vec<T, N> &u, const vec<T, N> &v) {
   vec<T, N> r;
-  for (int i = 0; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     r.e[i] = u[i] + v[i];
   }
   return r;
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> operator-(const vec<T, N> &u, const vec<T, N> &v) {
   vec<T, N> r;
-  for (int i = 0; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     r.e[i] = u[i] - v[i];
   }
   return r;
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> operator*(const vec<T, N> &u, const vec<T, N> &v) {
   vec<T, N> r;
-  for (int i = 0; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     r.e[i] = u[i] * v[i];
   }
   return r;
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> operator*(const T &t, const vec<T, N> &v) {
   vec<T, N> r;
-  for (int i = 0; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     r.e[i] = t * v[i];
   }
   return r;
 }
 
-template <class T, int N> inline vec<T, N> operator*(const vec<T, N> &v, T t) {
+template <std::floating_point T, std::size_t N>
+inline vec<T, N> operator*(const vec<T, N> &v, T t) {
   return t * v;
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> operator/(const vec<T, N> &v, double t) {
   return (1 / t) * v;
 }
 
-template <class T, int N> inline T dot(const vec<T, N> &u, const vec<T, N> &v) {
+template <std::floating_point T, std::size_t N>
+inline T dot(const vec<T, N> &u, const vec<T, N> &v) {
   T r = 0.0;
-  for (int i = 0; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     r += u[i] * v[i];
   }
   return r;
 }
 
 // 外積はN==3の時だけ存在する
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
   requires(N == 3)
 inline vec<T, N> cross(const vec<T, N> &u, const vec<T, N> &v) {
   return vec<T, N>(u.e[1] * v.e[2] - u.e[2] * v.e[1],
@@ -167,11 +170,13 @@ inline vec<T, N> cross(const vec<T, N> &u, const vec<T, N> &v) {
                    u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
-template <class T, int N> inline vec<T, N> unit_vector(vec<T, N> v) {
+template <std::floating_point T, std::size_t N>
+inline vec<T, N> unit_vector(vec<T, N> v) {
   return v / v.length();
 }
 
-template <class T, int N> inline vec<T, N> random_in_unit_sphere() {
+template <std::floating_point T, std::size_t N>
+inline vec<T, N> random_in_unit_sphere() {
   while (true) {
     auto p = vec<T, N>::random(-1, 1);
     if (p.length_squared() >= 1)
@@ -180,14 +185,15 @@ template <class T, int N> inline vec<T, N> random_in_unit_sphere() {
   }
 }
 
-template <class T, int N> inline vec<T, N> random_unit_vector() {
+template <std::floating_point T, std::size_t N>
+inline vec<T, N> random_unit_vector() {
   auto a = random_double(0, 2 * pi);
   auto z = random_double(-1, 1);
   auto r = sqrt(1 - z * z);
   return vec<T, N>(r * cos(a), r * sin(a), z);
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> random_in_hemisphere(const vec<T, N> &normal) {
   auto in_unit_sphere = random_in_unit_sphere<T, N>();
   if (dot(in_unit_sphere, normal) > 0.0)
@@ -196,7 +202,8 @@ inline vec<T, N> random_in_hemisphere(const vec<T, N> &normal) {
     return -in_unit_sphere;
 }
 
-template <class T, int N> inline vec<T, N> random_in_unit_disk() {
+template <std::floating_point T, std::size_t N>
+inline vec<T, N> random_in_unit_disk() {
   while (true) {
     auto p = vec<T, N>(random_double(-1, 1), random_double(-1, 1), 0);
     if (p.length_squared() >= 1)
@@ -205,12 +212,12 @@ template <class T, int N> inline vec<T, N> random_in_unit_disk() {
   }
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> reflect(const vec<T, N> &v, const vec<T, N> &n) {
   return v - 2 * dot(v, n) * n;
 }
 
-template <class T, int N>
+template <std::floating_point T, std::size_t N>
 inline vec<T, N> refract(const vec<T, N> &uv, const vec<T, N> &n,
                          double etai_over_etat) {
   auto cos_theta = dot(-uv, n);
