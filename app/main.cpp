@@ -1,14 +1,15 @@
-#include "rtmath/hittable.hpp"
 #include <iostream>
 #include <memory>
+#include <rtcore/hittable.hpp>
+#include <rtcore/hittable_list.hpp>
+#include <rtcore/sphere.hpp>
 #include <rtmath/color.hpp>
-#include <rtmath/hittable_list.hpp>
 #include <rtmath/ray.hpp>
-#include <rtmath/sphere.hpp>
 #include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
 
 using namespace rtmath;
+using namespace rtcore;
 
 // 引数で与えられた球体にrayが当たったかを計算する。当たった場所のカメラに近い方のtを返す。当たらなかったら-1を返す
 double hit_sphere(const point3 &center, double radius, const ray &r) {

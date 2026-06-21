@@ -1,8 +1,10 @@
 #include <cmath>
-#include <rtmath/sphere.hpp>
+#include <rtcore/sphere.hpp>
 
-namespace rtmath {
-bool sphere::hit(const ray &r, double t_min, double t_max,
+using namespace rtmath;
+
+namespace rtcore {
+bool sphere::hit(const rtmath::ray &r, double t_min, double t_max,
                  hit_record &rec) const {
   vec3 oc = r.origin() - center;
   auto a = r.direction().length_squared();
@@ -29,4 +31,4 @@ bool sphere::hit(const ray &r, double t_min, double t_max,
   }
   return false;
 }
-} // namespace rtmath
+} // namespace rtcore

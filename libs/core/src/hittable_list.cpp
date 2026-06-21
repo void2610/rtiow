@@ -1,7 +1,7 @@
-#include <rtmath/hittable_list.hpp>
+#include <rtcore/hittable_list.hpp>
 
-namespace rtmath {
-bool hittable_list::hit(const ray &r, double t_min, double t_max,
+namespace rtcore {
+bool hittable_list::hit(const rtmath::ray &r, double t_min, double t_max,
                         hit_record &rec) const {
   hit_record temp_rec;
   bool hit_anything = false;
@@ -17,4 +17,4 @@ bool hittable_list::hit(const ray &r, double t_min, double t_max,
 
   return hit_anything;
 }
-} // namespace rtmath
+} // namespace rtcore

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "hittable.hpp"
+#include <rtcore/hittable.hpp>
 
 #include <memory>
 #include <vector>
 
-namespace rtmath {
+namespace rtcore {
 class hittable_list : public hittable {
 public:
   hittable_list() {}
@@ -14,9 +14,9 @@ public:
   void clear() { objects.clear(); }
   void add(std::shared_ptr<hittable> object) { objects.push_back(object); }
 
-  virtual bool hit(const ray &r, double tmin, double tmax,
+  virtual bool hit(const rtmath::ray &r, double tmin, double tmax,
                    hit_record &rec) const;
 
   std::vector<std::shared_ptr<hittable>> objects;
 };
-} // namespace rtmath
+} // namespace rtcore
