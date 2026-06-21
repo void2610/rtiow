@@ -24,7 +24,7 @@ camera::camera(point3 lookfrom, point3 lookat, vec3 vup, double vfov,
 }
 
 rtmath::ray camera::get_ray(double s, double t) const {
-  vec3 rd = lens_radius * rtmath::random_in_unit_disk();
+  vec3 rd = lens_radius * rtmath::random_in_unit_disk<double, 3>();
   vec3 offset = u * rd.x() + v * rd.y();
 
   return rtmath::ray(origin + offset, lower_left_corner + s * horizontal +

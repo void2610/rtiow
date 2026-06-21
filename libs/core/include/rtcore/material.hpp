@@ -27,7 +27,8 @@ public:
   virtual bool scatter(const rtmath::ray &r_in, const hit_record &rec,
                        rtmath::color &attenuation,
                        rtmath::ray &scattered) const {
-    rtmath::vec3 scatter_direction = rec.normal + rtmath::random_unit_vector();
+    rtmath::vec3 scatter_direction =
+        rec.normal + rtmath::random_unit_vector<double, 3>();
     scattered = rtmath::ray(rec.p, scatter_direction);
     attenuation = albedo;
     return true;
@@ -45,7 +46,8 @@ public:
                        rtmath::ray &scattered) const {
     rtmath::vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
     scattered =
-        rtmath::ray(rec.p, reflected + fuzz * rtmath::random_in_unit_sphere());
+        rtmath::ray(rec.p, reflected +
+                               fuzz * rtmath::random_in_unit_sphere<double, 3>());
     attenuation = albedo;
     return (dot(scattered.direction(), rec.normal) > 0);
   }

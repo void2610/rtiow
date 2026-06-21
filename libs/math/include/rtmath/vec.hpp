@@ -4,62 +4,80 @@
 #include <cmath>
 #include <ostream>
 #include <stdexcept>
+#include <utility>
+#include <vector>
 
 namespace rtmath {
-class vec3 {
+
+template <class T, int N> class vec {
 public:
   // コンストラクタ
 
   // 要素を全て0で初期化する
-  vec3() : e{0, 0, 0} {}
+  vec() { e = std::vector<T>(0, N); }
   // 要素を3つ指定して初期化する
-  vec3(double e1, double e2, double e3) : e{e1, e2, e3} {}
+  vec(T e1, T e2, T e3) { e = {e1, e2, e3}; }
+  // 要素の配列から初期化する
+  vec(std::vector<T> v) : e(std::move(v)) {}
 
   // ゲッタ
   double x() const { return e[0]; }
   double y() const { return e[1]; }
   double z() const { return e[2]; }
 
-  inline static vec3 random() {
-    return vec3(random_double(), random_double(), random_double());
+  inline static vec random() {
+    std::vector<T> v;
+    for (int i = 0; i < N; i++) {
+      v.push_back(random_value<T>());
+    }
+    return v;
   }
 
-  inline static vec3 random(double min, double max) {
-    return vec3(random_double(min, max), random_double(min, max),
-                random_double(min, max));
+  inline static vec random(double min, double max) {
+    std::vector<T> v;
+    for (int i = 0; i < N; i++) {
+      v.push_back(random_value<T>(min, max));
+    }
+    return v;
   }
 
   // 演算子オーバーライド
 
-  vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
+  vec operator-() const {
+    std::vector<T> v;
+    for (int i = 0; i < N; i++) {
+      v.push_back(-e[i]);
+    }
+    return v;
+  }
 
   double operator[](int i) const {
-    if (i < 0 || 3 <= i)
-      throw std::out_of_range("vec3の添え字は0,1,2のいずれかです");
+    if (i < 0 || N <= i)
+      throw std::out_of_range("vecの大きさ外にアクセスしています");
     return e[i];
   };
 
   double &operator[](int i) {
-    if (i < 0 || 3 <= i)
-      throw std::out_of_range("vec3の添え字は0,1,2のいずれかです");
+    if (i < 0 || N <= i)
+      throw std::out_of_range("vecの大きさ外にアクセスしています");
     return e[i];
   };
 
-  vec3 &operator+=(const vec3 &v) {
-    e[0] += v.e[0];
-    e[1] += v.e[1];
-    e[2] += v.e[2];
+  vec &operator+=(const vec &v) {
+    for (int i = 0; i < N; i++) {
+      e[i] += v.e[i];
+    }
     return *this;
   }
 
-  vec3 &operator*=(const double t) {
-    e[0] *= t;
-    e[1] *= t;
-    e[2] *= t;
+  vec &operator*=(const double t) {
+    for (int i = 0; i < N; i++) {
+      e[i] *= t;
+    }
     return *this;
   }
 
-  vec3 &operator/=(const double &t) { return *this *= 1 / t; }
+  vec &operator/=(const double &t) { return *this *= 1 / t; }
 
   // ユーティリティ
 
@@ -68,96 +86,141 @@ public:
 
   // 全ての要素の2乗を足し合わせて返す
   double length_squared() const {
-    return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
+    double l = 0.0;
+    for (int i = 0; i < N; i++) {
+      l += e[i] * e[i];
+    }
+    return l;
   }
 
-  double e[3];
+  std::vector<T> e;
 };
 
 // ユーティリティ
 
-inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
-  return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
+template <class T, int N>
+inline std::ostream &operator<<(std::ostream &out, const vec<T, N> &v) {
+  for (int i = 0; i < N; i++) {
+    out << v[i] << ' ';
+  }
+  return out;
 }
 
-inline vec3 operator+(const vec3 &u, const vec3 &v) {
-  return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
+template <class T, int N>
+inline vec<T, N> operator+(const vec<T, N> &u, const vec<T, N> &v) {
+  vec<T, N> r;
+  for (int i = 0; i < N; i++) {
+    r.e.push_back(u[i] + v[i]);
+  }
+  return r;
 }
 
-inline vec3 operator-(const vec3 &u, const vec3 &v) {
-  return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
+template <class T, int N>
+inline vec<T, N> operator-(const vec<T, N> &u, const vec<T, N> &v) {
+  vec<T, N> r;
+  for (int i = 0; i < N; i++) {
+    r.e.push_back(u[i] - v[i]);
+  }
+  return r;
 }
 
-inline vec3 operator*(const vec3 &u, const vec3 &v) {
-  return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
+template <class T, int N>
+inline vec<T, N> operator*(const vec<T, N> &u, const vec<T, N> &v) {
+  vec<T, N> r;
+  for (int i = 0; i < N; i++) {
+    r.e.push_back(u[i] * v[i]);
+  }
+  return r;
 }
 
-inline vec3 operator*(const double &t, const vec3 &v) {
-  return vec3(t * v.e[0], t * v.e[1], t * v.e[2]);
+template <class T, int N>
+inline vec<T, N> operator*(const T &t, const vec<T, N> &v) {
+  vec<T, N> r;
+  for (int i = 0; i < N; i++) {
+    r.e.push_back(t * v[i]);
+  }
+  return r;
 }
 
-inline vec3 operator*(const vec3 &v, double t) { return t * v; }
-
-inline vec3 operator/(const vec3 &v, double t) { return (1 / t) * v; }
-
-inline double dot(const vec3 &u, const vec3 &v) {
-  return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
+template <class T, int N> inline vec<T, N> operator*(const vec<T, N> &v, T t) {
+  return t * v;
 }
 
-inline vec3 cross(const vec3 &u, const vec3 &v) {
-  return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
-              u.e[2] * v.e[0] - u.e[0] * v.e[2],
-              u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+template <class T, int N> inline vec<T, N> operator/(const vec<T, N> &v, double t) {
+  return (1 / t) * v;
 }
 
-inline vec3 unit_vector(vec3 v) { return v / v.length(); }
+template <class T, int N> inline T dot(const vec<T, N> &u, const vec<T, N> &v) {
+  T r = 0.0;
+  for (int i = 0; i < N; i++) {
+    r += u[i] * v[i];
+  }
+  return r;
+}
 
-inline vec3 random_in_unit_sphere() {
+// TODO: 4次元以上の外積は謎
+template <class T, int N>
+inline vec<T, N> cross(const vec<T, N> &u, const vec<T, N> &v) {
+  return vec<T, N>(u.e[1] * v.e[2] - u.e[2] * v.e[1],
+                   u.e[2] * v.e[0] - u.e[0] * v.e[2],
+                   u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+}
+
+template <class T, int N> inline vec<T, N> unit_vector(vec<T, N> v) {
+  return v / v.length();
+}
+
+template <class T, int N> inline vec<T, N> random_in_unit_sphere() {
   while (true) {
-    auto p = vec3::random(-1, 1);
+    auto p = vec<T, N>::random(-1, 1);
     if (p.length_squared() >= 1)
       continue;
     return p;
   }
 }
 
-inline vec3 random_unit_vector() {
+template <class T, int N> inline vec<T, N> random_unit_vector() {
   auto a = random_double(0, 2 * pi);
   auto z = random_double(-1, 1);
   auto r = sqrt(1 - z * z);
-  return vec3(r * cos(a), r * sin(a), z);
+  return vec<T, N>(r * cos(a), r * sin(a), z);
 }
 
-inline vec3 random_in_hemisphere(const vec3 &normal) {
-  vec3 in_unit_sphere = random_in_unit_sphere();
+template <class T, int N>
+inline vec<T, N> random_in_hemisphere(const vec<T, N> &normal) {
+  auto in_unit_sphere = random_in_unit_sphere<T, N>();
   if (dot(in_unit_sphere, normal) > 0.0)
     return in_unit_sphere;
   else
     return -in_unit_sphere;
 }
 
-inline vec3 random_in_unit_disk() {
+template <class T, int N> inline vec<T, N> random_in_unit_disk() {
   while (true) {
-    auto p = vec3(random_double(-1, 1), random_double(-1, 1), 0);
+    auto p = vec<T, N>(random_double(-1, 1), random_double(-1, 1), 0);
     if (p.length_squared() >= 1)
       continue;
     return p;
   }
 }
 
-inline vec3 reflect(const vec3 &v, const vec3 &n) {
+template <class T, int N>
+inline vec<T, N> reflect(const vec<T, N> &v, const vec<T, N> &n) {
   return v - 2 * dot(v, n) * n;
 }
 
-inline vec3 refract(const vec3 &uv, const vec3 &n, double etai_over_etat) {
+template <class T, int N>
+inline vec<T, N> refract(const vec<T, N> &uv, const vec<T, N> &n,
+                         double etai_over_etat) {
   auto cos_theta = dot(-uv, n);
-  vec3 r_out_parallel = etai_over_etat * (uv + cos_theta * n);
-  vec3 r_out_perp = -sqrt(1.0 - r_out_parallel.length_squared()) * n;
+  vec<T, N> r_out_parallel = etai_over_etat * (uv + cos_theta * n);
+  vec<T, N> r_out_perp = -sqrt(1.0 - r_out_parallel.length_squared()) * n;
   return r_out_parallel + r_out_perp;
 }
 
 // 型エイリアス
 
-using color = vec3;
-using point3 = vec3;
+using vec3 = vec<double, 3>;
+using color = vec<double, 3>;
+using point3 = vec<double, 3>;
 } // namespace rtmath
