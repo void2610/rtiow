@@ -105,5 +105,5 @@ inline vec3 unit_vector(vec3 v) { return v / v.length(); }
 // 型エイリアス
 
 using color = vec3;
-using point = vec3;
+using point3 = vec3;
 } // namespace rtmath
