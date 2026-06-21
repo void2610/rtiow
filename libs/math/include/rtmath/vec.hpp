@@ -1,11 +1,10 @@
 #pragma once
 
 #include "rtmath/utils.hpp"
+#include <array>
 #include <cmath>
 #include <ostream>
 #include <stdexcept>
-#include <utility>
-#include <vector>
 
 namespace rtmath {
 
@@ -14,11 +13,11 @@ public:
   // コンストラクタ
 
   // 要素を全て0で初期化する
-  vec() { e = std::vector<T>(0, N); }
+  vec() : e{} {}
   // 要素を3つ指定して初期化する
-  vec(T e1, T e2, T e3) { e = {e1, e2, e3}; }
+  vec(T e1, T e2, T e3) : e{e1, e2, e3} {}
   // 要素の配列から初期化する
-  vec(std::vector<T> v) : e(std::move(v)) {}
+  vec(const std::array<T, N> &v) : e(v) {}
 
   // ゲッタ
   double x() const { return e[0]; }
@@ -26,29 +25,29 @@ public:
   double z() const { return e[2]; }
 
   inline static vec random() {
-    std::vector<T> v;
+    vec r;
     for (int i = 0; i < N; i++) {
-      v.push_back(random_value<T>());
+      r.e[i] = random_value<T>();
     }
-    return v;
+    return r;
   }
 
   inline static vec random(double min, double max) {
-    std::vector<T> v;
+    vec r;
     for (int i = 0; i < N; i++) {
-      v.push_back(random_value<T>(min, max));
+      r.e[i] = random_value<T>(min, max);
     }
-    return v;
+    return r;
   }
 
   // 演算子オーバーライド
 
   vec operator-() const {
-    std::vector<T> v;
+    vec r;
     for (int i = 0; i < N; i++) {
-      v.push_back(-e[i]);
+      r.e[i] = -e[i];
     }
-    return v;
+    return r;
   }
 
   double operator[](int i) const {
@@ -93,7 +92,7 @@ public:
     return l;
   }
 
-  std::vector<T> e;
+  std::array<T, N> e;
 };
 
 // ユーティリティ
@@ -110,7 +109,7 @@ template <class T, int N>
 inline vec<T, N> operator+(const vec<T, N> &u, const vec<T, N> &v) {
   vec<T, N> r;
   for (int i = 0; i < N; i++) {
-    r.e.push_back(u[i] + v[i]);
+    r.e[i] = u[i] + v[i];
   }
   return r;
 }
@@ -119,7 +118,7 @@ template <class T, int N>
 inline vec<T, N> operator-(const vec<T, N> &u, const vec<T, N> &v) {
   vec<T, N> r;
   for (int i = 0; i < N; i++) {
-    r.e.push_back(u[i] - v[i]);
+    r.e[i] = u[i] - v[i];
   }
   return r;
 }
@@ -128,7 +127,7 @@ template <class T, int N>
 inline vec<T, N> operator*(const vec<T, N> &u, const vec<T, N> &v) {
   vec<T, N> r;
   for (int i = 0; i < N; i++) {
-    r.e.push_back(u[i] * v[i]);
+    r.e[i] = u[i] * v[i];
   }
   return r;
 }
@@ -137,7 +136,7 @@ template <class T, int N>
 inline vec<T, N> operator*(const T &t, const vec<T, N> &v) {
   vec<T, N> r;
   for (int i = 0; i < N; i++) {
-    r.e.push_back(t * v[i]);
+    r.e[i] = t * v[i];
   }
   return r;
 }
