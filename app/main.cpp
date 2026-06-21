@@ -43,7 +43,8 @@ int main() {
 
   std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-  camera cam(90, double(image_width) / image_height);
+  camera cam(point3(-2, 2, 1), point3(0, 0, -1), vec3(0, 1, 0), 90,
+             double(image_width) / image_height);
 
   auto R = cos(pi / 4);
   hittable_list world;
