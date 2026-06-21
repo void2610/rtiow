@@ -1,3 +1,5 @@
+#pragma once
+
 #include <rtmath/ray.hpp>
 #include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
