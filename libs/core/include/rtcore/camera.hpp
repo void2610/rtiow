@@ -4,9 +4,10 @@
 #include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
 
+namespace rtcore {
+
 using namespace rtmath;
 
-namespace rtcore {
 class camera {
 public:
   camera(point3 lookfrom, point3 lookat, vec3 vup, double vfov,

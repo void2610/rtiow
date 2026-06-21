@@ -4,10 +4,10 @@
 #include <rtcore/hittable.hpp>
 #include <rtmath/ray.hpp>
 
+namespace rtcore {
+
 using namespace rtmath;
 using namespace rtcore;
-
-namespace rtcore {
 
 inline double schlick(double cosine, double ref_idx) {
   auto r0 = (1 - ref_idx) / (1 + ref_idx);
