@@ -16,16 +16,14 @@ using std::make_shared;
 
 // レイの動きを演算して色を返す。当たらなかったら白-水色のグラデーション(背景色)を返す
 color ray_color(const ray &r, const hittable &world, int depth) {
-  hit_record rec;
-
   // 反射回数が一定よりも多くなったら、その時点で追跡をやめる
   if (depth <= 0)
     return color(0, 0, 0);
 
-  if (world.hit(r, 0.001, infinity, rec)) {
+  if (auto rec = world.hit(r, 0.001, infinity)) {
     ray scattered;
     color attenuation;
-    if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+    if (rec->mat_ptr->scatter(r, rec.value(), attenuation, scattered))
       return attenuation * ray_color(scattered, world, depth - 1);
     return color(0, 0, 0);
   }

@@ -1,11 +1,14 @@
+#include "rtcore/hittable.hpp"
 #include <cmath>
+#include <optional>
 #include <rtcore/sphere.hpp>
 
 using namespace rtmath;
 
 namespace rtcore {
-bool sphere::hit(const rtmath::ray &r, double t_min, double t_max,
-                 hit_record &rec) const {
+std::optional<hit_record> sphere::hit(const rtmath::ray &r, double t_min,
+                                      double t_max) const {
+  hit_record rec;
   vec3 oc = r.origin() - center;
   auto a = r.direction().length_squared();
   auto half_b = dot(oc, r.direction());
@@ -20,7 +23,7 @@ bool sphere::hit(const rtmath::ray &r, double t_min, double t_max,
       rec.p = r.at(rec.t);
       rec.set_face_normal(r, (rec.p - center) / radius);
       rec.mat_ptr = mat_ptr;
-      return true;
+      return rec;
     }
     temp = (-half_b + root) / a;
     if (temp < t_max && temp > t_min) {
@@ -28,9 +31,9 @@ bool sphere::hit(const rtmath::ray &r, double t_min, double t_max,
       rec.p = r.at(rec.t);
       rec.set_face_normal(r, (rec.p - center) / radius);
       rec.mat_ptr = mat_ptr;
-      return true;
+      return rec;
     }
   }
-  return false;
+  return std::nullopt;
 }
 } // namespace rtcore

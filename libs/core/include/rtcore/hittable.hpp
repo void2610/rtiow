@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <rtmath/ray.hpp>
 
 namespace rtcore {
@@ -24,7 +25,7 @@ struct hit_record {
 class hittable {
 public:
   virtual ~hittable() {}
-  virtual bool hit(const rtmath::ray &r, double t_min, double t_max,
-                   hit_record &rec) const = 0;
+  virtual std::optional<hit_record> hit(const rtmath::ray &r, double t_min,
+                                        double t_max) const = 0;
 };
 } // namespace rtcore

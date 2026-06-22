@@ -1,20 +1,19 @@
+#include <optional>
 #include <rtcore/hittable_list.hpp>
 
 namespace rtcore {
-bool hittable_list::hit(const rtmath::ray &r, double t_min, double t_max,
-                        hit_record &rec) const {
-  hit_record temp_rec;
-  bool hit_anything = false;
+std::optional<hit_record> hittable_list::hit(const rtmath::ray &r, double t_min,
+                                             double t_max) const {
+  std::optional<hit_record> result;
   auto closest_so_far = t_max;
 
   for (const auto &object : objects) {
-    if (object->hit(r, t_min, closest_so_far, temp_rec)) {
-      hit_anything = true;
-      closest_so_far = temp_rec.t;
-      rec = temp_rec;
+    if (const auto rec = object->hit(r, t_min, closest_so_far)) {
+      closest_so_far = rec->t;
+      result = rec;
     }
   }
 
-  return hit_anything;
+  return result;
 }
 } // namespace rtcore
