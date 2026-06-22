@@ -55,17 +55,9 @@ public:
     return r;
   }
 
-  T operator[](std::size_t i) const {
-    if (N <= i)
-      throw std::out_of_range("vecの大きさ外にアクセスしています");
-    return e[i];
-  };
+  T operator[](std::size_t i) const { return e[i]; };
 
-  T &operator[](std::size_t i) {
-    if (N <= i)
-      throw std::out_of_range("vecの大きさ外にアクセスしています");
-    return e[i];
-  };
+  T &operator[](std::size_t i) { return e[i]; };
 
   vec &operator+=(const vec &v) {
     for (std::size_t i = 0; i < N; i++) {
