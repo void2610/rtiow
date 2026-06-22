@@ -8,4 +8,3 @@ add_library(rtcore STATIC
 target_include_directories(rtcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # ヘッダで rtmath の型を公開しているので PUBLIC で伝播させる
 target_link_libraries(rtcore PUBLIC rtmath)
-target_link_libraries(rtcore PUBLIC rtimage)
