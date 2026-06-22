@@ -5,7 +5,6 @@
 #include <cmath>
 #include <concepts>
 #include <ostream>
-#include <stdexcept>
 
 namespace rtmath {
 
