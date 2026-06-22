@@ -5,7 +5,7 @@
 #include <rtcore/hittable_list.hpp>
 #include <rtcore/material.hpp>
 #include <rtcore/sphere.hpp>
-#include <rtmath/color.hpp>
+#include <rtimage/writer.hpp>
 #include <rtmath/ray.hpp>
 #include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
