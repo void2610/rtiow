@@ -1,3 +1,5 @@
+#pragma once
+
 #include "rtmath/vec.hpp"
 #include <string>
 #include <vector>
