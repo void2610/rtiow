@@ -81,8 +81,6 @@ int main() {
   const int samples_per_pixel = 20;
   const int max_depth = 50;
 
-  std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
   point3 lookfrom(13, 2, 3);
   point3 lookat(0, 0, 0);
   vec3 vup(0, 1, 0);
@@ -91,6 +89,8 @@ int main() {
   camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
 
   auto world = random_scene();
+
+  rtimage::image img(image_width, image_height);
 
   for (int j = image_height - 1; j >= 0; --j) {
     std::cerr << "\rScanlines remainning: " << j << ' ' << std::flush;
@@ -102,8 +102,11 @@ int main() {
         auto r = cam.get_ray(u, v);
         pixel_color += ray_color(r, world, max_depth);
       }
-      write_color(std::cout, pixel_color, samples_per_pixel);
+      img.set_pixel(i, image_height - 1 - j, pixel_color, samples_per_pixel);
     }
   }
   std::cerr << "\nDone.\n";
+
+  if (!img.save("output.png", rtimage::format::png))
+    std::cerr << "Failed to save output.png\n";
 }
