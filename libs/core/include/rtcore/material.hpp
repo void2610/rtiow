@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rtmath/vec.hpp"
+#include <optional>
 #include <rtcore/hittable.hpp>
 #include <rtmath/ray.hpp>
 
@@ -12,26 +13,27 @@ inline double schlick(double cosine, double ref_idx) {
   return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
 
+struct scatter_record {
+  rtmath::color attenuation;
+  rtmath::ray scattered;
+};
+
 class material {
 public:
   virtual ~material() {}
-  virtual bool scatter(const rtmath::ray &r_in, const hit_record &rec,
-                       rtmath::color &attenuation,
-                       rtmath::ray &scattered) const = 0;
+  virtual std::optional<scatter_record>
+  scatter(const rtmath::ray &r_in, const hit_record &rec) const = 0;
 };
 
 class lambertian : public material {
 public:
   lambertian(const rtmath::color &a) : albedo(a) {}
 
-  virtual bool scatter(const rtmath::ray &r_in, const hit_record &rec,
-                       rtmath::color &attenuation,
-                       rtmath::ray &scattered) const {
+  virtual std::optional<scatter_record>
+  scatter(const rtmath::ray &r_in, const hit_record &rec) const {
     rtmath::vec3 scatter_direction =
         rec.normal + rtmath::random_unit_vector<double, 3>();
-    scattered = rtmath::ray(rec.p, scatter_direction);
-    attenuation = albedo;
-    return true;
+    return scatter_record{albedo, rtmath::ray(rec.p, scatter_direction)};
   }
 
   rtmath::color albedo;
@@ -41,15 +43,14 @@ class metal : public material {
 public:
   metal(const rtmath::color &a, double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
 
-  virtual bool scatter(const rtmath::ray &r_in, const hit_record &rec,
-                       rtmath::color &attenuation,
-                       rtmath::ray &scattered) const {
+  virtual std::optional<scatter_record>
+  scatter(const rtmath::ray &r_in, const hit_record &rec) const {
     rtmath::vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
-    scattered =
-        rtmath::ray(rec.p, reflected +
-                               fuzz * rtmath::random_in_unit_sphere<double, 3>());
-    attenuation = albedo;
-    return (dot(scattered.direction(), rec.normal) > 0);
+    rtmath::ray scattered(
+        rec.p, reflected + fuzz * rtmath::random_in_unit_sphere<double, 3>());
+    if (dot(scattered.direction(), rec.normal) <= 0)
+      return std::nullopt;
+    return scatter_record{albedo, scattered};
   }
 
   rtmath::color albedo;
@@ -60,10 +61,9 @@ class dielectric : public material {
 public:
   dielectric(double ri) : ref_idx(ri) {}
 
-  virtual bool scatter(const rtmath::ray &r_in, const hit_record &rec,
-                       rtmath::color &attenuation,
-                       rtmath::ray &scattered) const {
-    attenuation = rtmath::color(1.0, 1.0, 1.0);
+  virtual std::optional<scatter_record>
+  scatter(const rtmath::ray &r_in, const hit_record &rec) const {
+    rtmath::color attenuation(1.0, 1.0, 1.0);
     double etai_over_etat;
     if (rec.front_face) {
       etai_over_etat = 1.0 / ref_idx;
@@ -76,20 +76,17 @@ public:
     double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
     if (etai_over_etat * sin_theta > 1.0) {
       rtmath::vec3 reflected = reflect(unit_direction, rec.normal);
-      scattered = rtmath::ray(rec.p, reflected);
-      return true;
+      return scatter_record{attenuation, rtmath::ray(rec.p, reflected)};
     }
     double reflect_prob = schlick(cos_theta, etai_over_etat);
     if (rtmath::random_double() < reflect_prob) {
       rtmath::vec3 reflected = reflect(unit_direction, rec.normal);
-      scattered = rtmath::ray(rec.p, reflected);
-      return true;
+      return scatter_record{attenuation, rtmath::ray(rec.p, reflected)};
     }
 
     rtmath::vec3 refracted =
         refract(unit_direction, rec.normal, etai_over_etat);
-    scattered = rtmath::ray(rec.p, refracted);
-    return true;
+    return scatter_record{attenuation, rtmath::ray(rec.p, refracted)};
   }
 
   double ref_idx;

@@ -21,10 +21,8 @@ color ray_color(const ray &r, const hittable &world, int depth) {
     return color(0, 0, 0);
 
   if (auto rec = world.hit(r, 0.001, infinity)) {
-    ray scattered;
-    color attenuation;
-    if (rec->mat_ptr->scatter(r, rec.value(), attenuation, scattered))
-      return attenuation * ray_color(scattered, world, depth - 1);
+    if (auto sr = rec->mat_ptr->scatter(r, rec.value()))
+      return sr->attenuation * ray_color(sr->scattered, world, depth - 1);
     return color(0, 0, 0);
   }
 
