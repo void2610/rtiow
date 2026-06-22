@@ -107,6 +107,6 @@ int main() {
   }
   std::cerr << "\nDone.\n";
 
-  if (!img.save("output.png", rtimage::format::png))
-    std::cerr << "Failed to save output.png\n";
+  if (!img.save("out.png", rtimage::format::png))
+    std::cerr << "Failed to save out.png\n";
 }
