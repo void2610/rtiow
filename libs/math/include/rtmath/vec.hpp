@@ -15,15 +15,19 @@ public:
 
   // 要素を全て0で初期化する
   vec() : e{} {}
-  // 要素を3つ指定して初期化する
-  vec(T e1, T e2, T e3) : e{e1, e2, e3} {}
+  // 要素をN個指定して初期化する
+  template <typename... Args>
+    requires(sizeof...(Args) == N) && (std::convertible_to<Args, T> && ...)
+  vec(Args... args) : e{static_cast<T>(args)...} {}
   // 要素の配列から初期化する
   vec(const std::array<T, N> &v) : e(v) {}
 
   // ゲッタ
-  double x() const { return e[0]; }
-  double y() const { return e[1]; }
-  double z() const { return e[2]; }
+  // clang-format off
+  T x() const requires(N >= 1) { return e[0]; }
+  T y() const requires(N >= 2) { return e[1]; }
+  T z() const requires(N >= 3) { return e[2]; }
+  // clang-format on
 
   inline static vec random() {
     vec r;
@@ -33,7 +37,7 @@ public:
     return r;
   }
 
-  inline static vec random(double min, double max) {
+  inline static vec random(T min, T max) {
     vec r;
     for (std::size_t i = 0; i < N; i++) {
       r.e[i] = random_value<T>(min, max);
@@ -51,13 +55,13 @@ public:
     return r;
   }
 
-  double operator[](std::size_t i) const {
+  T operator[](std::size_t i) const {
     if (N <= i)
       throw std::out_of_range("vecの大きさ外にアクセスしています");
     return e[i];
   };
 
-  double &operator[](std::size_t i) {
+  T &operator[](std::size_t i) {
     if (N <= i)
       throw std::out_of_range("vecの大きさ外にアクセスしています");
     return e[i];
@@ -70,22 +74,22 @@ public:
     return *this;
   }
 
-  vec &operator*=(const double t) {
+  vec &operator*=(const T t) {
     for (std::size_t i = 0; i < N; i++) {
       e[i] *= t;
     }
     return *this;
   }
 
-  vec &operator/=(const double &t) { return *this *= 1 / t; }
+  vec &operator/=(const T &t) { return *this *= 1 / t; }
 
   // ユーティリティ
 
   // ベクトルの大きさを返す
-  double length() const { return std::sqrt(length_squared()); }
+  T length() const { return std::sqrt(length_squared()); }
 
   // 全ての要素の2乗を足し合わせて返す
-  double length_squared() const {
+  T length_squared() const {
     double l = 0.0;
     for (std::size_t i = 0; i < N; i++) {
       l += e[i] * e[i];
@@ -148,7 +152,7 @@ inline vec<T, N> operator*(const vec<T, N> &v, T t) {
 }
 
 template <std::floating_point T, std::size_t N>
-inline vec<T, N> operator/(const vec<T, N> &v, double t) {
+inline vec<T, N> operator/(const vec<T, N> &v, T t) {
   return (1 / t) * v;
 }
 
@@ -186,9 +190,10 @@ inline vec<T, N> random_in_unit_sphere() {
 }
 
 template <std::floating_point T, std::size_t N>
+  requires(N == 3)
 inline vec<T, N> random_unit_vector() {
-  auto a = random_double(0, 2 * pi);
-  auto z = random_double(-1, 1);
+  auto a = random_value<T>(0, 2 * pi);
+  auto z = random_value<T>(-1, 1);
   auto r = sqrt(1 - z * z);
   return vec<T, N>(r * cos(a), r * sin(a), z);
 }
@@ -203,9 +208,10 @@ inline vec<T, N> random_in_hemisphere(const vec<T, N> &normal) {
 }
 
 template <std::floating_point T, std::size_t N>
+  requires(N == 3)
 inline vec<T, N> random_in_unit_disk() {
   while (true) {
-    auto p = vec<T, N>(random_double(-1, 1), random_double(-1, 1), 0);
+    auto p = vec<T, N>(random_value<T>(-1, 1), random_value<T>(-1, 1), 0);
     if (p.length_squared() >= 1)
       continue;
     return p;
@@ -219,7 +225,7 @@ inline vec<T, N> reflect(const vec<T, N> &v, const vec<T, N> &n) {
 
 template <std::floating_point T, std::size_t N>
 inline vec<T, N> refract(const vec<T, N> &uv, const vec<T, N> &n,
-                         double etai_over_etat) {
+                         T etai_over_etat) {
   auto cos_theta = dot(-uv, n);
   vec<T, N> r_out_parallel = etai_over_etat * (uv + cos_theta * n);
   vec<T, N> r_out_perp = -sqrt(1.0 - r_out_parallel.length_squared()) * n;
