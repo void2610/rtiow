@@ -18,6 +18,7 @@ using namespace rtmath;
 using namespace rtcore;
 
 NB_MODULE(_rtiow, m) {
+  m.doc() = "C++で実装されたレイトレーサー";
   // --- rtmath ---
   nb::class_<vec3>(m, "Vec3")
       .def(nb::init<>())
