@@ -1,6 +1,5 @@
 #include <iostream>
 #include <memory>
-#include <ostream>
 #include <rtcore/camera.hpp>
 #include <rtcore/hittable.hpp>
 #include <rtcore/hittable_list.hpp>
@@ -15,6 +14,14 @@
 using namespace rtmath;
 using namespace rtcore;
 using std::make_shared;
+
+struct render_config {
+  int image_width;
+  int image_height;
+  float aspect_ratio;
+  int samples_per_pixel;
+  int max_depth;
+};
 
 // レイの動きを演算して色を返す。当たらなかったら白-水色のグラデーション(背景色)を返す
 color ray_color(const ray &r, const hittable &world, int depth) {
@@ -76,6 +83,21 @@ hittable_list random_scene() {
   return world;
 }
 
+void render_row(rtimage::image &img, int j, const camera &cam,
+                const hittable &world, const render_config &cfg) {
+  for (int i = 0; i < cfg.image_width; ++i) {
+    color pixel_color(0, 0, 0);
+    for (int s = 0; s < cfg.samples_per_pixel; ++s) {
+      auto u = (i + random_double()) / (cfg.image_width - 1);
+      auto v = (j + random_double()) / (cfg.image_height - 1);
+      auto r = cam.get_ray(u, v);
+      pixel_color += ray_color(r, world, cfg.max_depth);
+    }
+    img.set_pixel(i, cfg.image_height - 1 - j, pixel_color,
+                  cfg.samples_per_pixel);
+  }
+}
+
 int main() {
   const unsigned thread_count =
       std::max(1u, std::thread::hardware_concurrency());
@@ -83,38 +105,28 @@ int main() {
   std::atomic<int> completed{0};
 
   const int image_width = 384;
-  const double aspect_ratio = 16.0 / 9.0;
-  const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 50;
-  const int max_depth = 10;
+
+  const render_config cfg{384, static_cast<int>(image_width / (16.0 / 9.0)),
+                          (16.0 / 9.0), 50, 10};
 
   point3 lookfrom(13, 2, 3);
   point3 lookat(0, 0, 0);
   vec3 vup(0, 1, 0);
   auto dist_to_focus = 10;
   auto aperture = 0.1;
-  camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+  camera cam(lookfrom, lookat, vup, 20, cfg.aspect_ratio, aperture,
+             dist_to_focus);
 
   auto world = random_scene();
 
-  rtimage::image img(image_width, image_height);
+  rtimage::image img(image_width, cfg.image_height);
 
   auto worker = [&] {
     int j;
-    while ((j = next_row.fetch_add(1)) < image_height) {
-      for (int i = 0; i < image_width; ++i) {
-        color pixel_color(0, 0, 0);
-        for (int s = 0; s < samples_per_pixel; ++s) {
-          auto u = (i + random_double()) / (image_width - 1);
-          auto v = (j + random_double()) / (image_height - 1);
-          auto r = cam.get_ray(u, v);
-          pixel_color += ray_color(r, world, max_depth);
-        }
-        img.set_pixel(i, image_height - 1 - j, pixel_color, samples_per_pixel);
-      }
-      completed.fetch_add(1);
-      std::cerr << "\r" << completed.load() << " / " << image_height
-                << std::flush;
+    while ((j = next_row.fetch_add(1)) < cfg.image_height) {
+      render_row(img, j, cam, world, cfg);
+      std::cerr << "\r" << completed.fetch_add(1) + 1 << " / "
+                << cfg.image_height << std::flush;
     }
   };
 
