@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <rtcore/camera.hpp>
 #include <rtcore/hittable.hpp>
 #include <rtcore/hittable_list.hpp>
@@ -9,6 +10,7 @@
 #include <rtmath/ray.hpp>
 #include <rtmath/utils.hpp>
 #include <rtmath/vec.hpp>
+#include <thread>
 
 using namespace rtmath;
 using namespace rtcore;
@@ -75,11 +77,16 @@ hittable_list random_scene() {
 }
 
 int main() {
+  const unsigned thread_count =
+      std::max(1u, std::thread::hardware_concurrency());
+  std::atomic<int> next_row{0};
+  std::atomic<int> completed{0};
+
   const int image_width = 384;
   const double aspect_ratio = 16.0 / 9.0;
   const int image_height = static_cast<int>(image_width / aspect_ratio);
-  const int samples_per_pixel = 20;
-  const int max_depth = 50;
+  const int samples_per_pixel = 50;
+  const int max_depth = 10;
 
   point3 lookfrom(13, 2, 3);
   point3 lookat(0, 0, 0);
@@ -92,19 +99,31 @@ int main() {
 
   rtimage::image img(image_width, image_height);
 
-  for (int j = image_height - 1; j >= 0; --j) {
-    std::cerr << "\rScanlines remainning: " << j << ' ' << std::flush;
-    for (int i = 0; i < image_width; ++i) {
-      color pixel_color(0, 0, 0);
-      for (int s = 0; s < samples_per_pixel; ++s) {
-        auto u = (i + random_double()) / (image_width - 1);
-        auto v = (j + random_double()) / (image_height - 1);
-        auto r = cam.get_ray(u, v);
-        pixel_color += ray_color(r, world, max_depth);
+  auto worker = [&] {
+    int j;
+    while ((j = next_row.fetch_add(1)) < image_height) {
+      for (int i = 0; i < image_width; ++i) {
+        color pixel_color(0, 0, 0);
+        for (int s = 0; s < samples_per_pixel; ++s) {
+          auto u = (i + random_double()) / (image_width - 1);
+          auto v = (j + random_double()) / (image_height - 1);
+          auto r = cam.get_ray(u, v);
+          pixel_color += ray_color(r, world, max_depth);
+        }
+        img.set_pixel(i, image_height - 1 - j, pixel_color, samples_per_pixel);
       }
-      img.set_pixel(i, image_height - 1 - j, pixel_color, samples_per_pixel);
+      completed.fetch_add(1);
+      std::cerr << "\r" << completed.load() << " / " << image_height
+                << std::flush;
     }
-  }
+  };
+
+  {
+    std::vector<std::jthread> pool;
+    for (unsigned t = 0; t < thread_count; ++t)
+      pool.emplace_back(worker);
+  } // このスコープを抜けるとjthreadが全部自動joinされる
+
   std::cerr << "\nDone.\n";
 
   if (!img.save("out.png", rtimage::format::png))
