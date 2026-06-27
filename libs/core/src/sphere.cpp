@@ -1,7 +1,8 @@
-#include "rtcore/hittable.hpp"
 #include <cmath>
 #include <optional>
+#include <rtcore/hittable.hpp>
 #include <rtcore/sphere.hpp>
+#include <rtmath/aabb.hpp>
 
 using namespace rtmath;
 
@@ -35,5 +36,11 @@ std::optional<hit_record> sphere::hit(const rtmath::ray &r, double t_min,
     }
   }
   return std::nullopt;
+}
+
+std::optional<rtmath::aabb> sphere::bounding_box(double t0, double t1) const {
+  auto res = rtmath::aabb(center - vec3(radius, radius, radius),
+                          center + vec3(radius, radius, radius));
+  return res;
 }
 } // namespace rtcore

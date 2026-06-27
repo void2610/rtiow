@@ -1,3 +1,5 @@
+#pragma once
+
 #include "rtmath/ray.hpp"
 #include "rtmath/vec.hpp"
 
@@ -49,5 +51,16 @@ inline bool aabb::hit(const ray &r, double tmin, double tmax) const {
 //   }
 //   return true;
 // }
+
+inline rtmath::aabb surrounding_box(rtmath::aabb box0, rtmath::aabb box1) {
+  rtmath::point3 small(fmin(box0.min().x(), box1.min().x()),
+                       fmin(box0.min().y(), box1.min().y()),
+                       fmin(box0.min().z(), box1.min().z()));
+  rtmath::point3 big(fmin(box0.max().x(), box1.max().x()),
+                     fmin(box0.max().y(), box1.max().y()),
+                     fmin(box0.max().z(), box1.max().z()));
+
+  return rtmath::aabb(small, big);
+}
 
 } // namespace rtmath

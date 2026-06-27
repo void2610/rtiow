@@ -17,6 +17,8 @@ public:
   virtual std::optional<hit_record> hit(const rtmath::ray &r, double t_min,
                                         double t_max) const;
 
+  virtual std::optional<rtmath::aabb> bounding_box(double t0, double t1) const;
+
   std::vector<std::shared_ptr<hittable>> objects;
 };
 } // namespace rtcore

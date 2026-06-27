@@ -1,3 +1,4 @@
+#include "rtmath/aabb.hpp"
 #include <optional>
 #include <rtcore/hittable_list.hpp>
 
@@ -15,5 +16,24 @@ std::optional<hit_record> hittable_list::hit(const rtmath::ray &r, double t_min,
   }
 
   return result;
+}
+
+std::optional<rtmath::aabb> hittable_list::bounding_box(double t0,
+                                                        double t1) const {
+  if (objects.empty())
+    return std::nullopt;
+
+  rtmath::aabb res;
+  rtmath::aabb temp;
+  bool first_box = true;
+
+  for (const auto &object : objects) {
+    if (!object->bounding_box(t0, t1))
+      return std::nullopt;
+    res = first_box ? temp : rtmath::surrounding_box(res, temp);
+    first_box = false;
+  }
+
+  return res;
 }
 } // namespace rtcore

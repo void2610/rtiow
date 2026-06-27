@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <optional>
+#include <rtmath/aabb.hpp>
 #include <rtmath/ray.hpp>
 
 namespace rtcore {
@@ -27,5 +28,7 @@ public:
   virtual ~hittable() {}
   virtual std::optional<hit_record> hit(const rtmath::ray &r, double t_min,
                                         double t_max) const = 0;
+  virtual std::optional<rtmath::aabb> bounding_box(double t0,
+                                                   double t1) const = 0;
 };
 } // namespace rtcore
