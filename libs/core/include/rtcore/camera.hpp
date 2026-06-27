@@ -11,7 +11,8 @@ class camera {
 
 public:
   camera(point3 lookfrom, point3 lookat, vec3 vup, double vfov,
-         double aspect_ratio, double aperture, double focus_dist);
+         double aspect_ratio, double aperture, double focus_dist, double t0 = 0,
+         double t1 = 0);
 
   rtmath::ray get_ray(double s, double t) const;
 
@@ -22,5 +23,7 @@ private:
   vec3 vertical;
   vec3 u, v, w;
   double lens_radius;
+  double time0; // シャッターが開く時刻
+  double time1; // シャッターが閉じる時刻
 };
 } // namespace rtcore
