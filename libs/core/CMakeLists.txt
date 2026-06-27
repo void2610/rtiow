@@ -4,6 +4,7 @@ add_library(rtcore STATIC
   src/moving_sphere.cpp
   src/hittable_list.cpp
   src/camera.cpp
+  src/bvh.cpp
 )
 # 自身のビルドと利用側の両方にインクルードパスを伝える
 target_include_directories(rtcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
