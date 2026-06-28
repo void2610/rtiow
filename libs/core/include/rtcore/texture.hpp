@@ -53,7 +53,8 @@ public:
 
   virtual rtmath::color value(double u, double v,
                               const rtmath::point3 &p) const {
-    return rtmath::color(1, 1, 1) * 0.5 * (1.0 - noise.noise(scale * p));
+    return rtmath::color(1, 1, 1) * 0.5 *
+           (1.0 + sin(scale * p.z() + 10 * noise.turb(p)));
   }
 
 public:
