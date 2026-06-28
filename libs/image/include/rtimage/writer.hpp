@@ -13,6 +13,10 @@ public:
   void set_pixel(int x, int y, const rtmath::color &c, int samples_per_pixel);
   bool save(const std::string &path, format fmt) const;
 
+  int width() const { return width_; }
+  int height() const { return height_; }
+  const unsigned char *data() const { return pixels_.data(); }
+
 private:
   int width_, height_;
   std::vector<unsigned char> pixels_;

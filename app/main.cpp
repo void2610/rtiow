@@ -1,3 +1,19 @@
+#ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
+#endif
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
+#define GLFW_INCLUDE_NONE // GLFWによるGLヘッダ取り込みを止め、二重インクルードを避ける
+#include <GLFW/glfw3.h>
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#else
+#include <GL/gl.h>
+#endif
+
 #include <iostream>
 #include <memory>
 #include <rtcore/camera.hpp>
@@ -126,6 +142,82 @@ hittable_list two_perlin_spheres() {
   return objects;
 }
 
+// レンダリング済み画像をOpenGLテクスチャ化し、ImGuiウィンドウに表示する
+void show_viewer(const rtimage::image &img) {
+  glfwSetErrorCallback([](int code, const char *desc) {
+    std::cerr << "GLFW error " << code << ": " << desc << '\n';
+  });
+  if (!glfwInit()) {
+    std::cerr << "Failed to initialize GLFW\n";
+    return;
+  }
+
+  // macOSはコアプロファイルのForward Compatが必須
+  const char *glsl_version = "#version 150";
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+  GLFWwindow *window =
+      glfwCreateWindow(1280, 720, "raytracer viewer", nullptr, nullptr);
+  if (!window) {
+    std::cerr << "Failed to create GLFW window\n";
+    glfwTerminate();
+    return;
+  }
+  glfwMakeContextCurrent(window);
+  glfwSwapInterval(1);
+
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGui::StyleColorsDark();
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init(glsl_version);
+
+  // 描画結果をRGBテクスチャとしてアップロード
+  GLuint texture = 0;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 行幅がwidth*3で4バイト境界に揃わないため
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.width(), img.height(), 0, GL_RGB,
+               GL_UNSIGNED_BYTE, img.data());
+
+  while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("Render");
+    ImGui::Text("%d x %d", img.width(), img.height());
+    ImGui::Image(static_cast<ImTextureID>(static_cast<intptr_t>(texture)),
+                 ImVec2(static_cast<float>(img.width()),
+                        static_cast<float>(img.height())));
+    ImGui::End();
+
+    ImGui::Render();
+    int display_w, display_h;
+    glfwGetFramebufferSize(window, &display_w, &display_h);
+    glViewport(0, 0, display_w, display_h);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    glfwSwapBuffers(window);
+  }
+
+  glDeleteTextures(1, &texture);
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+  glfwDestroyWindow(window);
+  glfwTerminate();
+}
+
 void render_row(rtimage::image &img, int j, const camera &cam,
                 const hittable &world, const render_config &cfg) {
   for (int i = 0; i < cfg.image_width; ++i) {
@@ -183,4 +275,6 @@ int main() {
 
   if (!img.save("out.png", rtimage::format::png))
     std::cerr << "Failed to save out.png\n";
+
+  show_viewer(img);
 }
