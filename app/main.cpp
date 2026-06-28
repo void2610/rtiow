@@ -42,6 +42,13 @@ color ray_color(const ray &r, const hittable &world, int depth) {
   return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 
+hittable_list earth() {
+  auto tex = make_shared<image_texture>("earthmap.jpg");
+  auto surface = make_shared<lambertian>(tex);
+  auto globe = make_shared<sphere>(point3(0, 0, 0), 2, surface);
+  return hittable_list(globe);
+}
+
 hittable_list random_scene() {
   hittable_list world;
 
@@ -153,7 +160,7 @@ int main() {
   camera cam(lookfrom, lookat, vup, 20, cfg.aspect_ratio, aperture,
              dist_to_focus, 0.0, 1.0);
 
-  auto world = two_perlin_spheres();
+  auto world = earth();
 
   rtimage::image img(image_width, cfg.image_height);
 

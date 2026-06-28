@@ -24,14 +24,14 @@ rtmath::color image_texture::value(double u, double v,
                                    const rtmath::vec3 &p) const {
   // テクスチャがない場合、紫色を返す
   if (data == nullptr)
-    return rtmath::color(0, 1, 1);
+    return rtmath::color(1, 0, 1);
 
   // 入力されたテクスチャ座標を[0,1]で切り捨てる
   u = rtmath::clamp(u, 0.0, 1.0);
   v = 1.0 - rtmath::clamp(v, 0.0, 1.0);
 
   auto i = static_cast<int>(u * width);
-  auto j = static_cast<int>(u * height);
+  auto j = static_cast<int>(v * height);
 
   // 整数座標をさらに切り捨てる (テクスチャ座標は1.0になってはいけない)
   if (i >= width)

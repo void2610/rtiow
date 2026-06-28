@@ -22,7 +22,11 @@ std::optional<hit_record> sphere::hit(const rtmath::ray &r, double t_min,
     if (temp < t_max && temp > t_min) {
       rec.t = temp;
       rec.p = r.at(rec.t);
-      rec.set_face_normal(r, (rec.p - center) / radius);
+      auto outward_normal = (rec.p - center) / radius;
+      rec.set_face_normal(r, outward_normal);
+      auto uv = get_sphere_uv(outward_normal);
+      rec.u = uv.e[0];
+      rec.v = uv.e[1];
       rec.mat_ptr = mat_ptr;
       return rec;
     }
@@ -30,7 +34,11 @@ std::optional<hit_record> sphere::hit(const rtmath::ray &r, double t_min,
     if (temp < t_max && temp > t_min) {
       rec.t = temp;
       rec.p = r.at(rec.t);
-      rec.set_face_normal(r, (rec.p - center) / radius);
+      auto outward_normal = (rec.p - center) / radius;
+      rec.set_face_normal(r, outward_normal);
+      auto uv = get_sphere_uv(outward_normal);
+      rec.u = uv.e[0];
+      rec.v = uv.e[1];
       rec.mat_ptr = mat_ptr;
       return rec;
     }

@@ -23,8 +23,7 @@ void image::set_pixel(int x, int y, const rtmath::color &c,
   g = std::sqrt(scale * g);
   b = std::sqrt(scale * b);
 
-  const std::size_t idx =
-      (static_cast<std::size_t>(y) * width_ + x) * 3;
+  const std::size_t idx = (static_cast<std::size_t>(y) * width_ + x) * 3;
   pixels_[idx + 0] =
       static_cast<unsigned char>(255.999 * rtmath::clamp(r, 0.0, 0.999));
   pixels_[idx + 1] =
@@ -45,8 +44,7 @@ bool image::save(const std::string &path, format fmt) const {
     ofs << "P3\n" << width_ << ' ' << height_ << "\n255\n";
     for (int y = 0; y < height_; ++y) {
       for (int x = 0; x < width_; ++x) {
-        const std::size_t idx =
-            (static_cast<std::size_t>(y) * width_ + x) * 3;
+        const std::size_t idx = (static_cast<std::size_t>(y) * width_ + x) * 3;
         ofs << static_cast<int>(pixels_[idx + 0]) << ' '
             << static_cast<int>(pixels_[idx + 1]) << ' '
             << static_cast<int>(pixels_[idx + 2]) << '\n';

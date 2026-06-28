@@ -71,7 +71,7 @@ public:
 
   image_texture(const char *filepath);
 
-  ~image_texture() { delete data; }
+  ~image_texture() { free(data); }
 
   virtual rtmath::color value(double u, double v, const rtmath::vec3 &p) const;
 
