@@ -5,7 +5,9 @@ add_library(rtcore STATIC
   src/hittable_list.cpp
   src/camera.cpp
   src/bvh.cpp
+  src/image_texture.cpp
 )
+
 # 自身のビルドと利用側の両方にインクルードパスを伝える
 target_include_directories(rtcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # ヘッダで rtmath の型を公開しているので PUBLIC で伝播させる

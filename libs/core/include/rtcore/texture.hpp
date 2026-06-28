@@ -2,6 +2,7 @@
 
 #include "rtmath/perlin.hpp"
 #include "rtmath/vec.hpp"
+#include <cstddef>
 namespace rtcore {
 class texture {
 public:
@@ -60,6 +61,25 @@ public:
 public:
   rtmath::perlin noise;
   double scale;
+};
+
+class image_texture : public texture {
+public:
+  const static int bytes_per_pixel = 3;
+
+  image_texture() : data(nullptr), width(0), height(0), bytes_per_scanline(0) {}
+
+  image_texture(const char *filepath);
+
+  ~image_texture() { delete data; }
+
+  virtual rtmath::color value(double u, double v, const rtmath::vec3 &p) const;
+
+private:
+  unsigned char *data;
+  int width;
+  int height;
+  int bytes_per_scanline;
 };
 
 } // namespace rtcore
