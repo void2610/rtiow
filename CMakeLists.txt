@@ -8,6 +8,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# stbをルートで取得し、複数ライブラリで共有する
+include(FetchContent)
+FetchContent_Declare(
+  stb
+  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(stb)
+
+# ヘッダオンリーのstbをインクルードパスとして配るINTERFACEライブラリ
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
+
 # サブディレクトリの登録 (依存される側(lib)が先)
 add_subdirectory(libs/math)
 add_subdirectory(libs/core)
