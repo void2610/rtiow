@@ -107,6 +107,18 @@ hittable_list two_spheres() {
   return objects;
 }
 
+hittable_list two_perlin_spheres() {
+  hittable_list objects;
+
+  auto pertext = make_shared<noise_texture>();
+  objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000,
+                                  make_shared<lambertian>(pertext)));
+  objects.add(make_shared<sphere>(point3(0, 2, 0), 2,
+                                  make_shared<lambertian>(pertext)));
+
+  return objects;
+}
+
 void render_row(rtimage::image &img, int j, const camera &cam,
                 const hittable &world, const render_config &cfg) {
   for (int i = 0; i < cfg.image_width; ++i) {
@@ -141,7 +153,7 @@ int main() {
   camera cam(lookfrom, lookat, vup, 20, cfg.aspect_ratio, aperture,
              dist_to_focus, 0.0, 1.0);
 
-  auto world = two_spheres();
+  auto world = two_perlin_spheres();
 
   rtimage::image img(image_width, cfg.image_height);
 

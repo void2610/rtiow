@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rtmath/perlin.hpp"
 #include "rtmath/vec.hpp"
 namespace rtcore {
 class texture {
@@ -45,4 +46,18 @@ public:
   std::shared_ptr<texture> even;
   std::shared_ptr<texture> odd;
 };
+
+class noise_texture : public texture {
+public:
+  noise_texture() {}
+
+  virtual rtmath::color value(double u, double v,
+                              const rtmath::point3 &p) const {
+    return rtmath::color(1, 1, 1) * noise.noise(p);
+  }
+
+public:
+  rtmath::perlin noise;
+};
+
 } // namespace rtcore
