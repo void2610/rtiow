@@ -45,9 +45,11 @@ color ray_color(const ray &r, const hittable &world, int depth) {
 hittable_list random_scene() {
   hittable_list world;
 
-  auto ground_material =
-      make_shared<lambertian>(make_shared<solid_color>(0.5, 0.5, 0.5));
-  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
+  auto checker =
+      make_shared<checker_texture>(make_shared<solid_color>(0.2, 0.3, 0.1),
+                                   make_shared<solid_color>(0.9, 0.9, 0.9));
+  world.add(make_shared<sphere>(point3(0, -1000, 0), 1000,
+                                make_shared<lambertian>(checker)));
 
   for (int a = -11; a < 11; a++) {
     for (int b = -11; b < 11; b++) {
@@ -90,6 +92,21 @@ hittable_list random_scene() {
   return world;
 }
 
+hittable_list two_spheres() {
+  hittable_list objects;
+
+  auto checker =
+      make_shared<checker_texture>(make_shared<solid_color>(0.2, 0.3, 0.1),
+                                   make_shared<solid_color>(0.9, 0.9, 0.9));
+
+  objects.add(make_shared<sphere>(point3(0, -10, 0), 10,
+                                  make_shared<lambertian>(checker)));
+  objects.add(make_shared<sphere>(point3(0, 10, 0), 10,
+                                  make_shared<lambertian>(checker)));
+
+  return objects;
+}
+
 void render_row(rtimage::image &img, int j, const camera &cam,
                 const hittable &world, const render_config &cfg) {
   for (int i = 0; i < cfg.image_width; ++i) {
@@ -124,7 +141,7 @@ int main() {
   camera cam(lookfrom, lookat, vup, 20, cfg.aspect_ratio, aperture,
              dist_to_focus, 0.0, 1.0);
 
-  auto world = random_scene();
+  auto world = two_spheres();
 
   rtimage::image img(image_width, cfg.image_height);
 
