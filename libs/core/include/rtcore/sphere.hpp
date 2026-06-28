@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rtmath/utils.hpp"
+#include "rtmath/vec.hpp"
 #include <memory>
 #include <rtcore/hittable.hpp>
 
@@ -18,4 +20,13 @@ public:
   double radius;
   std::shared_ptr<material> mat_ptr;
 };
+
+inline rtmath::vec<double, 2> get_sphere_uv(const rtmath::vec3 &p) {
+  auto phi = atan2(p.z(), p.x());
+  auto theta = asin(p.y());
+  rtmath::vec<double, 2> res;
+  res.e[0] = 1 - (phi + rtmath::pi) / (2 * rtmath::pi);
+  res.e[1] = (theta + rtmath::pi / 2) / rtmath::pi;
+  return res;
+}
 } // namespace rtcore

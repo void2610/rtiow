@@ -6,6 +6,7 @@
 #include <rtcore/material.hpp>
 #include <rtcore/moving_sphere.hpp>
 #include <rtcore/sphere.hpp>
+#include <rtcore/texture.hpp>
 #include <rtimage/writer.hpp>
 #include <rtmath/ray.hpp>
 #include <rtmath/utils.hpp>
@@ -44,7 +45,8 @@ color ray_color(const ray &r, const hittable &world, int depth) {
 hittable_list random_scene() {
   hittable_list world;
 
-  auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
+  auto ground_material =
+      make_shared<lambertian>(make_shared<solid_color>(0.5, 0.5, 0.5));
   world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
   for (int a = -11; a < 11; a++) {
@@ -57,7 +59,8 @@ hittable_list random_scene() {
         if (choose_mat < 0.8) {
           // diffuse
           auto albedo = color::random() * color::random();
-          sphere_material = make_shared<lambertian>(albedo);
+          sphere_material =
+              make_shared<lambertian>(make_shared<solid_color>(albedo));
           auto center2 = center + vec3(0, random_double(0, 0.5), 0);
           world.add(make_shared<moving_sphere>(center, center2, 0.0, 1.0, 0.2,
                                                sphere_material));
@@ -78,7 +81,8 @@ hittable_list random_scene() {
 
   auto material1 = make_shared<dielectric>(1.5);
   world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
-  auto material2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+  auto material2 =
+      make_shared<lambertian>(make_shared<solid_color>(color(0.4, 0.2, 0.1)));
   world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
   auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));

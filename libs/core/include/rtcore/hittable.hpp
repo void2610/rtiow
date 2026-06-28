@@ -14,6 +14,8 @@ struct hit_record {
   rtmath::vec3 normal;
   std::shared_ptr<material> mat_ptr;
   double t;
+  double u;
+  double v;
   bool front_face;
 
   inline void set_face_normal(const rtmath::ray &r,

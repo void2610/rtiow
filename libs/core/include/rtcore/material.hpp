@@ -1,8 +1,10 @@
 #pragma once
 
 #include "rtmath/vec.hpp"
+#include <memory>
 #include <optional>
 #include <rtcore/hittable.hpp>
+#include <rtcore/texture.hpp>
 #include <rtmath/ray.hpp>
 
 namespace rtcore {
@@ -27,17 +29,17 @@ public:
 
 class lambertian : public material {
 public:
-  lambertian(const rtmath::color &a) : albedo(a) {}
+  lambertian(std::shared_ptr<texture> a) : albedo(a) {}
 
   virtual std::optional<scatter_record> scatter(const rtmath::ray &r_in,
                                                 const hit_record &rec) const {
     rtmath::vec3 scatter_direction =
         rec.normal + rtmath::random_unit_vector<double, 3>();
-    return scatter_record{albedo,
+    return scatter_record{albedo->value(rec.u, rec.v, rec.p),
                           rtmath::ray(rec.p, scatter_direction, r_in.time())};
   }
 
-  rtmath::color albedo;
+  std::shared_ptr<texture> albedo;
 };
 
 class metal : public material {
@@ -78,17 +80,20 @@ public:
     double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
     if (etai_over_etat * sin_theta > 1.0) {
       rtmath::vec3 reflected = reflect(unit_direction, rec.normal);
-      return scatter_record{attenuation, rtmath::ray(rec.p, reflected, r_in.time())};
+      return scatter_record{attenuation,
+                            rtmath::ray(rec.p, reflected, r_in.time())};
     }
     double reflect_prob = schlick(cos_theta, etai_over_etat);
     if (rtmath::random_double() < reflect_prob) {
       rtmath::vec3 reflected = reflect(unit_direction, rec.normal);
-      return scatter_record{attenuation, rtmath::ray(rec.p, reflected, r_in.time())};
+      return scatter_record{attenuation,
+                            rtmath::ray(rec.p, reflected, r_in.time())};
     }
 
     rtmath::vec3 refracted =
         refract(unit_direction, rec.normal, etai_over_etat);
-    return scatter_record{attenuation, rtmath::ray(rec.p, refracted, r_in.time())};
+    return scatter_record{attenuation,
+                          rtmath::ray(rec.p, refracted, r_in.time())};
   }
 
   double ref_idx;
