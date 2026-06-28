@@ -10,6 +10,17 @@ const double pi = 3.1415926535897932385;
 
 inline double degrees_to_radians(double degrees) { return degrees * pi / 180; }
 
+inline double trilinear_interp(double c[2][2][2], double u, double v,
+                               double w) {
+  auto accum = 0.0;
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 2; j++)
+      for (int k = 0; k < 2; k++)
+        accum += (i * u + (1 - i) * (1 - u)) * (j * v + (1 - j) * (1 - v)) *
+                 (k * w + (1 - k) * (1 - w)) * c[i][j][k];
+  return accum;
+}
+
 template <typename T> inline T random_value() {
   static thread_local std::mt19937 gen{std::random_device{}()};
   if constexpr (std::floating_point<T>) {

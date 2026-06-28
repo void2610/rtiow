@@ -49,15 +49,16 @@ public:
 
 class noise_texture : public texture {
 public:
-  noise_texture() {}
+  noise_texture(double sc) : scale(sc) {}
 
   virtual rtmath::color value(double u, double v,
                               const rtmath::point3 &p) const {
-    return rtmath::color(1, 1, 1) * noise.noise(p);
+    return rtmath::color(1, 1, 1) * 0.5 * (1.0 - noise.noise(scale * p));
   }
 
 public:
   rtmath::perlin noise;
+  double scale;
 };
 
 } // namespace rtcore
